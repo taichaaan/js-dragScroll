@@ -1,12 +1,12 @@
-/*! dragScroll.js | v1.0.0 | license Copyright (C) 2022 Taichi Matsutaka */
+/*! dragScroll.js | v1.1.0 | license Copyright (C) 2022 Taichi Matsutaka */
 /*
  *
  * @name    : dragScroll.js
  * @content : dragScroll
  * @url     : https://github.com/taichaaan/js-dragScroll
  * @creation: 2022.07.30
- * @update  : 2022.07.30
- * @version : 1.0.0
+ * @update  : 2022.08.03
+ * @version : 1.1.0
  *
  */
 (function(global) {[]
@@ -19,6 +19,7 @@
 		const defaults = {
 			dragSelector   : null,
 			centerStart    : true,
+			startClass     : 'is-start',
 			getMaxSizeEvent: ['DOMContentLoaded','load','resize'],
 		}
 
@@ -122,12 +123,18 @@
 			let scrollFlg = true;
 
 			const onScroll = function(){
+				target.classList.add( options['startClass'] );
+
 				if( scrollFlg === true ){
 					left = _window.scrollLeft;
 					top  = _window.scrollTop;
 				}
 			}
-			_window.addEventListener('scroll',onScroll);
+			window.addEventListener('load',function(){
+				setTimeout(function(){
+					_window.addEventListener('scroll',onScroll);
+				},200);
+			});
 
 			/* ---------- removes ---------- */
 			_this.removes.push( function(){
@@ -190,6 +197,8 @@
 			// onMousedown
 			///////////////////////////////////////////
 			const onMousedown = function(){
+				target.classList.add( options['startClass'] );
+
 				defaultX = event.clientX || event.changedTouches[0].clientX;
 				defaultY = event.clientY || event.changedTouches[0].clientY;
 
