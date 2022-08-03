@@ -50,6 +50,7 @@ new dragScroll('.js-dragScroll',{
 | ---- | ---- | ---- | ---- |
 | dragSelector | string | null | ドラッグされる要素を文字列で指定してください。<br>指定がなければ直下の初めの子要素となります。<br>また、dragSelectorは必ずtargetの子要素としてください。 |
 | centerStart | boolean | true | 中央からスタートする場合は、trueを指定して下さい。 |
+| startClass | string | 'is-start' | スタート直後に付与されるクラスを指定してください。 |
 | getMaxSizeEvent | array | ['DOMContentLoaded','load','resize'] | ドラッグできる最大値・最小値を取得するイベントを配列で指定してください。 |
 
 
