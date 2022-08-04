@@ -1,4 +1,4 @@
-/*! dragScroll.js | v1.1.0 | license Copyright (C) 2022 Taichi Matsutaka */
+/*! dragScroll.js | v1.2.0 | license Copyright (C) 2022 Taichi Matsutaka */
 /*
  *
  * @name    : dragScroll.js
@@ -6,7 +6,7 @@
  * @url     : https://github.com/taichaaan/js-dragScroll
  * @creation: 2022.07.30
  * @update  : 2022.08.03
- * @version : 1.1.0
+ * @version : 1.2.0
  *
  */
 (function(global) {[]
@@ -20,6 +20,7 @@
 			dragSelector   : null,
 			centerStart    : true,
 			startClass     : 'is-start',
+			startTarget    : 'this', // or 'parent' or 'selector',
 			getMaxSizeEvent: ['DOMContentLoaded','load','resize'],
 		}
 
@@ -50,12 +51,19 @@
 			///////////////////////////////////////////////////////////////
 			// variable
 			///////////////////////////////////////////////////////////////
-			const target = document.querySelector( this.target );
-			let inner    = target.querySelector( options['dragSelector'] );
-			let _window  = window;
+			const target    = document.querySelector( this.target );
+			let inner       = target.querySelector( options['dragSelector'] );
+			let startTarget = target;
+			let _window     = window;
 
 			if( !inner ){ inner = target.children[0]; }
 			if( target.tagName !== 'BODY' ){ _window = target; }
+
+			if( options['startTarget'] === 'parent' ){
+				startTarget = target.parentNode;
+			} else if( options['startTarget'] !== 'this' ){
+				startTarget = document.querySelector( options['startTarget'] );
+			}
 
 			/* ---------- x,y ---------- */
 			let left     = 0;
@@ -118,12 +126,23 @@
 
 
 			///////////////////////////////////////////////////////////////
+			// addStartClass
+			///////////////////////////////////////////////////////////////
+			const addStartClass = function(){
+				startTarget.classList.add( options['startClass'] );
+			}
+
+
+
+
+
+			///////////////////////////////////////////////////////////////
 			// scroll
 			///////////////////////////////////////////////////////////////
 			let scrollFlg = true;
 
 			const onScroll = function(){
-				target.classList.add( options['startClass'] );
+				addStartClass();
 
 				if( scrollFlg === true ){
 					left = _window.scrollLeft;
@@ -197,7 +216,7 @@
 			// onMousedown
 			///////////////////////////////////////////
 			const onMousedown = function(){
-				target.classList.add( options['startClass'] );
+				addStartClass();
 
 				defaultX = event.clientX || event.changedTouches[0].clientX;
 				defaultY = event.clientY || event.changedTouches[0].clientY;
