@@ -1,12 +1,12 @@
-/*! dragScroll.js | v1.4.0 | license Copyright (C) 2022 Taichi Matsutaka */
+/*! dragScroll.js | v1.4.1 | license Copyright (C) 2022 Taichi Matsutaka */
 /**
  *
  * @name    : dragScroll.js
  * @content : dragScroll
  * @url     : https://github.com/taichaaan/js-dragScroll
  * @creation: 2022.07.30
- * @update  : 2022.08.23
- * @version : 1.4.0
+ * @update  : 2022.09.15
+ * @version : 1.4.1
  *
  */
 (function(global) {[]
@@ -206,7 +206,7 @@
 
 			const onScroll = function(){
 				addStartClass();
-				startTarget.classList.add( options['dragStartClass'] );
+				startTarget.classList.add( options['scrollStartClass'] );
 
 				if( scrollFlg === true ){
 					defaultScrollLeft = _window.scrollLeft;
@@ -275,8 +275,8 @@
 
 				document.body.setAttribute('onSelectStart','');
 				target.classList.remove('is-drag');
-				defaultScrollLeft = valueX;
-				defaultScrollTop  = valueY;
+				defaultScrollLeft = _window.scrollLeft;
+				defaultScrollTop  = _window.scrollTop;
 
 				target.removeEventListener('mousemove',onMousemove);
 				target.removeEventListener('touchmove',onMousemove);
@@ -288,7 +288,7 @@
 			///////////////////////////////////////////
 			const onMousedown = function(){
 				addStartClass();
-				startTarget.classList.add( options['startClass'] );
+				startTarget.classList.add( options['dragStartClass'] );
 
 				defaultX = event.clientX || event.changedTouches[0].clientX;
 				defaultY = event.clientY || event.changedTouches[0].clientY;
