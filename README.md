@@ -54,6 +54,8 @@ new dragScroll('.js-dragScroll',{
 | scrollStartClass | string | 'is-scroll-start' | スクロールした直後に付与されるクラスを指定してください。 |
 | dragStartClass | string | 'is-drag-start' | ドラッグした直後に付与されるクラスを指定してください。 |
 | startTarget | string | 'this' | startClassを付与するターゲットを指定してください。<br>・'this' -- 自分自身<br>・'parent' -- 親要素<br>・selector -- セレクタ |
+| currentSelector | string | null | 現在のズームの割合を%で出力するセレクタを指定してください。 |
+| keepSelector | string | null | ズームさせない要素を指定してください。<br>dragSelectorがズームされますが、子孫要素のkeepSelectorをtransform: scaleでズームさせないように見せます。 |
 | zoom | boolean | true | ズーム機能を使用するか否か。 |
 | zoomPlusSelector | string | null | ズームのプラスボタンのセレクタを指定してください。 |
 | zoomMinusSelector | string | null | ズームのマイナスボタンのセレクタを指定してください。 |
