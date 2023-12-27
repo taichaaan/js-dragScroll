@@ -1,12 +1,12 @@
-/*! dragScroll.js | v2.0.0 | license Copyright (C) 2022 - 2023 Taichi Matsutaka */
+/*! dragScroll.js | v2.0.1 | license Copyright (C) 2022 - 2023 Taichi Matsutaka */
 /**
  *
  * @name    : dragScroll.js
  * @content : dragScroll
  * @url     : https://github.com/taichaaan/js-dragScroll
  * @creation: 2022.07.30
- * @update  : 2023.12.21
- * @version : 2.0.0
+ * @update  : 2023.12.27
+ * @version : 2.0.1
  * @Note    : Only construction is considered, not reconstruction or destruction.
  *            Breakpoints are also not considered.
  *
@@ -74,12 +74,12 @@
 			this.startTarget = document.querySelector( this.options['startTarget'] );
 		}
 
-		this.targetWidth       = this.target.clientWidth;
-		this.targetHeight      = this.target.clientHeight;
-		this.innerWidth        = this.inner.getBoundingClientRect().width;
-		this.innerHeight       = this.inner.getBoundingClientRect().height;
-		this.innerNormalWidth  = this.inner.clientWidth;
-		this.innerNormalHeight = this.inner.clientHeight;
+		this.targetWidth          = this.target.clientWidth;
+		this.targetHeight         = this.target.clientHeight;
+		this.transformInnerWidth  = this.inner.getBoundingClientRect().width;
+		this.transformInnerHeight = this.inner.getBoundingClientRect().height;
+		this.realInnerWidth       = this.inner.clientWidth;
+		this.realInnerHeight      = this.inner.clientHeight;
 
 		this.defaultScrollLeft = 0;
 		this.defaultScrollTop  = 0;
@@ -89,8 +89,8 @@
 		this.mouseY            = 0;
 		this.valueX            = this.defaultX - this.mouseX;
 		this.valueY            = this.defaultY - this.mouseY;
-		this.maxX              = this.innerWidth - this.targetWidth;
-		this.maxY              =this. innerHeight - this.targetHeight;
+		this.maxX              = this.transformInnerWidth - this.targetWidth;
+		this.maxY              =this. transformInnerHeight - this.targetHeight;
 
 		this.isTouchstart = window.ontouchstart === null?"touchstart":"click";
 		this.scrollFlg    = true;
@@ -104,8 +104,8 @@
 		this.scaleIndex  = null;
 		this.scaleLength = null;
 
-		this.scaleInnerSizeWidth  = this.innerNormalWidth * this.options['zoomScale'];
-		this.scaleInnerSizeHeight = this.innerNormalHeight * this.options['zoomScale'];
+		this.scaleOnceWidth  = this.realInnerWidth * this.options['zoomScale'];
+		this.scaleOnceHeight = this.realInnerHeight * this.options['zoomScale'];
 
 		this.zoomMinScale = this.options['zoomMinScale'];
 
@@ -128,15 +128,15 @@
 			 * getTargetSize
 			**************************************************************/
 			_this.getTargetSize = function(){
-				_this.targetWidth       = _this.target.clientWidth;
-				_this.targetHeight      = _this.target.clientHeight;
-				_this.innerWidth        = _this.inner.getBoundingClientRect().width;
-				_this.innerHeight       = _this.inner.getBoundingClientRect().height;
-				_this.innerNormalWidth  = _this.inner.clientWidth;
-				_this.innerNormalHeight = _this.inner.clientHeight;
+				_this.targetWidth          = _this.target.clientWidth;
+				_this.targetHeight         = _this.target.clientHeight;
+				_this.transformInnerWidth  = _this.inner.getBoundingClientRect().width;
+				_this.transformInnerHeight = _this.inner.getBoundingClientRect().height;
+				_this.realInnerWidth       = _this.inner.clientWidth;
+				_this.realInnerHeight      = _this.inner.clientHeight;
 
-				_this.maxX = _this.innerWidth - _this.targetWidth;
-				_this.maxY = _this.innerHeight - _this.targetHeight;
+				_this.maxX = _this.transformInnerWidth - _this.targetWidth;
+				_this.maxY = _this.transformInnerHeight - _this.targetHeight;
 			}
 
 			for ( let i = 0; i < _this.options['getSizeEvent'].length; i++ ) {
@@ -154,12 +154,12 @@
 				const positions = _this.options['startPosition'].split(' ');
 
 				if( _this.options['startPosition'] == 'center' ){
-					///////////////////////////////////////////
-					// center start
-					///////////////////////////////////////////
+					/******************************************
+					 * center start
+					******************************************/
 					startPosition = function(){
-						_this.valueX = _this.innerWidth / 2 - _this.targetWidth / 2;
-						_this.valueY = _this.innerHeight / 2 - _this.targetHeight / 2;
+						_this.valueX = _this.transformInnerWidth / 2 - _this.targetWidth / 2;
+						_this.valueY = _this.transformInnerHeight / 2 - _this.targetHeight / 2;
 						_this._window.scrollTo( _this.valueX , _this.valueY );
 
 						_this.defaultScrollLeft = _this.valueX;
@@ -167,9 +167,9 @@
 					}
 
 				} else if( positions[0].indexOf('px') != -1  ){
-					///////////////////////////////////////////
-					// px start
-					///////////////////////////////////////////
+					/******************************************
+					 * px start
+					******************************************/
 					startPosition = function(){
 						_this.valueX = positions[0].slice( 0, -2 ) ;
 						_this.valueY = positions[1].slice( 0, -2 ) ;
@@ -180,15 +180,15 @@
 					}
 
 				} else if( positions[0].indexOf('%') != -1  ){
-					///////////////////////////////////////////
-					// % center start
-					///////////////////////////////////////////
+					/******************************************
+					 * % center start
+					******************************************/
 					startPosition = function(){
 						const pctX = positions[0].slice( 0, -1 ) ;
 						const pctY = positions[1].slice( 0, -1 ) ;
 
-						_this.valueX = _this.innerWidth * (pctX / 100) - _this.targetWidth / 2;
-						_this.valueY = _this.innerHeight * (pctY / 100) - _this.targetHeight / 2;
+						_this.valueX = _this.transformInnerWidth * (pctX / 100) - _this.targetWidth / 2;
+						_this.valueY = _this.transformInnerHeight * (pctY / 100) - _this.targetHeight / 2;
 						_this._window.scrollTo( _this.valueX , _this.valueY );
 
 						_this.defaultScrollLeft = _this.valueX;
@@ -358,8 +358,8 @@
 			 * デフォルトのズーム
 			******************************************/
 			if( _this.options['zoomDefaultScale'] < 1 ){
-				_this.inner.style.marginRight  = '-'+ _this.innerNormalWidth - _this.innerWidth +'px';
-				_this.inner.style.marginBottom = '-'+ _this.innerNormalHeight - _this.innerHeight +'px';
+				_this.inner.style.marginRight  = '-'+ _this.realInnerWidth - _this.transformInnerWidth +'px';
+				_this.inner.style.marginBottom = '-'+ _this.realInnerHeight - _this.transformInnerHeight +'px';
 			}
 
 
@@ -368,8 +368,8 @@
 			 * ズームするときの一回の拡大値を取得
 			******************************************/
 			const getScaleInnerSize = function(){
-				_this.scaleInnerSizeWidth  = _this.innerNormalWidth * _this.options['zoomScale'];
-				_this.scaleInnerSizeHeight = _this.innerNormalHeight * _this.options['zoomScale'];
+				_this.scaleOnceWidth  = _this.realInnerWidth * _this.options['zoomScale'];
+				_this.scaleOnceHeight = _this.realInnerHeight * _this.options['zoomScale'];
 			}
 
 			for ( let i = 0; i < _this.options['getSizeEvent'].length; i++ ) {
@@ -384,8 +384,8 @@
 			******************************************/
 			if( _this.options['zoomMinScale'] == 'auto' ){
 				const getZoomMinScale = function(){
-					const scaleX = _this.targetWidth / _this.innerNormalWidth;
-					const scaleY = _this.targetHeight / _this.innerNormalHeight;
+					const scaleX = _this.targetWidth / _this.realInnerWidth;
+					const scaleY = _this.targetHeight / _this.realInnerHeight;
 
 					_this.zoomMinScale = Math.max(scaleX,scaleY);
 				}
@@ -473,8 +473,8 @@
 
 					/* ---------- position ---------- */
 					if( _this.scale < 1 ){
-						_this.inner.style.marginRight  = '-'+ _this.innerNormalWidth - _this.innerWidth +'px';
-						_this.inner.style.marginBottom = '-'+ _this.innerNormalHeight - _this.innerHeight +'px';
+						_this.inner.style.marginRight  = '-'+ _this.realInnerWidth - _this.transformInnerWidth +'px';
+						_this.inner.style.marginBottom = '-'+ _this.realInnerHeight - _this.transformInnerHeight +'px';
 					} else{
 						_this.inner.style.marginRight  = '';
 						_this.inner.style.marginBottom = '';
@@ -505,7 +505,7 @@
 
 			if( _this.keepSelector ){
 				keepScale = function(){
-					const scale = _this.innerNormalWidth / ( _this.innerNormalWidth * _this.scale );
+					const scale = _this.realInnerWidth / ( _this.realInnerWidth * _this.scale );
 
 					for ( let i = 0; i < _this.keepSelector.length; i++ ) {
 						_this.keepSelector[i].style.transform = 'scale('+ scale +')';
@@ -632,18 +632,18 @@
 						_this.defaultScrollLeft = -( _this.inner.getBoundingClientRect().left );
 						_this.defaultScrollTop  = -( _this.inner.getBoundingClientRect().top );
 
-						if( _this.defaultScrollLeft < _this.scaleInnerSizeWidth / 2 ){
+						if( _this.defaultScrollLeft < _this.scaleOnceWidth / 2 ){
 							originX = 0;
-						} else if( _this.defaultScrollLeft > _this.innerWidth - _this.scaleInnerSizeWidth / 2 ){
-							originX = _this.innerWidth - _this.scaleInnerSizeWidth * scaleRatio + 'px';
+						} else if( _this.defaultScrollLeft > _this.maxX - _this.scaleOnceWidth / 2 ){
+							originX = '100%';
 						} else{
 							originX = ( _this.targetWidth / 2 + _this.defaultScrollLeft ) * scaleRatio + 'px';
 						}
 
-						if( _this.defaultScrollTop < _this.scaleInnerSizeHeight / 2 ){
+						if( _this.defaultScrollTop < _this.scaleOnceHeight / 2 ){
 							originY = 0;
-						} else if( _this.defaultScrollTop > _this.innerHeight - _this.scaleInnerSizeHeight / 2 ){
-							originY = _this.innerHeight - _this.scaleInnerSizeHeight * scaleRatio + 'px';
+						} else if( _this.defaultScrollTop > _this.maxY - _this.scaleOnceHeight / 2 ){
+							originY = '100%';
 						} else{
 							originY = ( _this.targetHeight / 2 + _this.defaultScrollTop ) * scaleRatio + 'px';
 						}
